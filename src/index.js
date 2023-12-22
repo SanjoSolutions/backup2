@@ -138,15 +138,10 @@ async function backUp() {
   const git = simpleGit(pathToBackUpTo)
     .env('GIT_WORK_TREE', pathToBackUp)
     .env('GIT_DIR', pathToBackUpTo)
-  // FIXME
   if (!(await doesFileExist(path.join(pathToBackUpTo, 'objects')))) {
-    console.log('a')
     await git.init()
-    console.log('b')
     await git.add('.')
-    console.log('c')
     await commit()
-    console.log('d')
   }
 
   for await (const event of fs.watch(pathToBackUp, { recursive: true })) {
