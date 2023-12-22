@@ -1,3 +1,3 @@
 # Backup
 
-This tools aims to provide continious backups (backups for every change).
+This tools aims to provide continuous backups (backups for every change).
