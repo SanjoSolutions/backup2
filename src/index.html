@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Backup</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <h1>Settings</h1>
+
+    <label>
+      Path to back up
+      <div class="full-width-input-with-button">
+        <input type="text" id="pathToBackUp" name="pathToBackUp" />
+        <button id="pickPathToBackUp">Pick path</button>
+      </div>
+    </label>
+
+    <label>
+      Path to back up to
+      <div class="full-width-input-with-button">
+        <input type="text" id="pathToBackUpTo" name="pathToBackUpTo" />
+        <button id="pickPathToBackUpTo">Pick path</button>
+      </div>
+    </label>
+
+    <div style="text-align: right">
+      <button id="startBackingUp">Start backing up</button>
+      <button id="stopBackingUp" class="hidden">Stop backing up</button>
+    </div>
+
+    <script>
+      const $pathToBackUp = document.querySelector('#pathToBackUp')
+      const $pickPathToBackUp = document.querySelector('#pickPathToBackUp')
+
+      $pickPathToBackUp.addEventListener('click', async () => {
+        const folderPath = await window.electronAPI.pickPathToBackUp()
+        $pathToBackUp.value = folderPath ?? ''
+        updateStartBackingUpEnabledState()
+      })
+
+      const $pathToBackUpTo = document.querySelector('#pathToBackUpTo')
+      const $pickPathToBackUpTo = document.querySelector('#pickPathToBackUpTo')
+
+      $pickPathToBackUpTo.addEventListener('click', async () => {
+        const folderPath = await window.electronAPI.pickPathToBackUpTo()
+        $pathToBackUpTo.value = folderPath ?? ''
+        updateStartBackingUpEnabledState()
+      })
+
+      const $startBackingUp = document.querySelector('#startBackingUp')
+
+      $startBackingUp.addEventListener('click', function () {
+        window.electronAPI.startBackingUp()
+        $startBackingUp.classList.add('hidden')
+        $stopBackingUp.classList.remove('hidden')
+      })
+
+      const $stopBackingUp = document.querySelector('#stopBackingUp')
+
+      $stopBackingUp.addEventListener('click', function () {
+        window.electronAPI.stopBackingUp()
+        $stopBackingUp.classList.add('hidden')
+        $startBackingUp.classList.remove('hidden')
+        updateStartBackingUpEnabledState()
+      })
+
+      function updateStartBackingUpEnabledState() {
+        $startBackingUp.disabled =
+          $pathToBackUp.value === '' || $pathToBackUpTo.value === ''
+      }
+
+      updateStartBackingUpEnabledState()
+    </script>
+  </body>
+</html>

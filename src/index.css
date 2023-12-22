@@ -1,0 +1,21 @@
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.full-width-input-with-button {
+  display: flex;
+}
+
+.full-width-input-with-button input {
+  flex-grow: 1;
+  margin-right: 0.5rem;
+}
+
+.full-width-input-with-button button {
+  flex-grow: 0;
+}
+
+.hidden {
+  display: none !important;
+}
