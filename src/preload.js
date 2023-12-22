@@ -16,4 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   stopBackingUp() {
     ipcRenderer.send('stopBackingUp')
   },
+  requestSettings() {
+    return ipcRenderer.invoke('requestSettings')
+  },
 })

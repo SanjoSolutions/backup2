@@ -93,6 +93,9 @@ async function main() {
       ipcMain.on('stopBackingUp', function () {
         isBackingUpEnabled = false
       })
+      ipcMain.handle('requestSettings', async function () {
+        return await loadSettings()
+      })
       createWindow()
     })
 
@@ -133,8 +136,17 @@ async function backUp() {
   const pathToBackUpTo = settings.pathToBackUpTo
 
   const git = simpleGit(pathToBackUpTo)
-  if (!(await doesFileExist(path.join(pathToBackUpTo, '.git')))) {
+    .env('GIT_WORK_TREE', pathToBackUp)
+    .env('GIT_DIR', pathToBackUpTo)
+  // FIXME
+  if (!(await doesFileExist(path.join(pathToBackUpTo, 'objects')))) {
+    console.log('a')
     await git.init()
+    console.log('b')
+    await git.add('.')
+    console.log('c')
+    await commit()
+    console.log('d')
   }
 
   for await (const event of fs.watch(pathToBackUp, { recursive: true })) {
@@ -147,38 +159,20 @@ async function backUp() {
     console.log(eventType, filePath)
     if (filePath && eventType === 'change') {
       const sourcePath = path.join(pathToBackUp, filePath)
-      const destinationPath = path.join(
-        pathToBackUpTo,
-        sourcePath[0],
-        sourcePath.substring(3)
-      )
       try {
         let stats
         try {
           stats = await fs.stat(sourcePath)
         } catch (error) {
           if (error.code === 'ENOENT') {
-            await removeFileFromBackUp(destinationPath)
+            await removeFileFromBackUp(sourcePath)
             continue
           } else {
             throw error
           }
         }
         if (stats.isFile()) {
-          await fs.mkdir(path.dirname(destinationPath), { recursive: true })
-          try {
-            await fs.copyFile(sourcePath, destinationPath)
-          } catch (error) {
-            if (error.code === 'EBUSY') {
-              continue
-            } else if (error.code === 'ENOENT') {
-              await removeFileFromBackUp(destinationPath)
-              continue
-            } else {
-              throw error
-            }
-          }
-          await git.add(destinationPath)
+          await git.add(sourcePath)
           await commit()
         }
       } catch (error) {
@@ -189,7 +183,7 @@ async function backUp() {
 
   async function removeFileFromBackUp(filePath) {
     try {
-      await git.rm(filePath)
+      await git.add(filePath)
     } catch (error) {
       return
     }

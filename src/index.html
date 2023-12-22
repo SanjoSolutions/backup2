@@ -29,9 +29,20 @@
       <button id="stopBackingUp" class="hidden">Stop backing up</button>
     </div>
 
-    <script>
+    <script type="module">
       const $pathToBackUp = document.querySelector('#pathToBackUp')
       const $pickPathToBackUp = document.querySelector('#pickPathToBackUp')
+
+      const $pathToBackUpTo = document.querySelector('#pathToBackUpTo')
+      const $pickPathToBackUpTo = document.querySelector('#pickPathToBackUpTo')
+
+      const $startBackingUp = document.querySelector('#startBackingUp')
+      const $stopBackingUp = document.querySelector('#stopBackingUp')
+
+      const settings = await window.electronAPI.requestSettings()
+      $pathToBackUp.value = settings.pathToBackUp
+      $pathToBackUpTo.value = settings.pathToBackUpTo
+      updateStartBackingUpEnabledState()
 
       $pickPathToBackUp.addEventListener('click', async () => {
         const folderPath = await window.electronAPI.pickPathToBackUp()
@@ -39,24 +50,17 @@
         updateStartBackingUpEnabledState()
       })
 
-      const $pathToBackUpTo = document.querySelector('#pathToBackUpTo')
-      const $pickPathToBackUpTo = document.querySelector('#pickPathToBackUpTo')
-
       $pickPathToBackUpTo.addEventListener('click', async () => {
         const folderPath = await window.electronAPI.pickPathToBackUpTo()
         $pathToBackUpTo.value = folderPath ?? ''
         updateStartBackingUpEnabledState()
       })
 
-      const $startBackingUp = document.querySelector('#startBackingUp')
-
       $startBackingUp.addEventListener('click', function () {
         window.electronAPI.startBackingUp()
         $startBackingUp.classList.add('hidden')
         $stopBackingUp.classList.remove('hidden')
       })
-
-      const $stopBackingUp = document.querySelector('#stopBackingUp')
 
       $stopBackingUp.addEventListener('click', function () {
         window.electronAPI.stopBackingUp()
@@ -69,8 +73,6 @@
         $startBackingUp.disabled =
           $pathToBackUp.value === '' || $pathToBackUpTo.value === ''
       }
-
-      updateStartBackingUpEnabledState()
     </script>
   </body>
 </html>
